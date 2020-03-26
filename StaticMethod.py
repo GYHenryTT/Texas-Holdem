@@ -1,8 +1,16 @@
 import collections
 
+HAND_RANK = ("High-Card", "One-Pair", "Two-Pair", "3-of-a-Kind", "Straight", "Flush", "Full-House", "4-of-a-Kind",
+             "Straight-Flush")
+RANK_LIST = ("2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A")
+SUIT_LIST = ("H", "S", "D", "C")
+
 
 def bet_option():
-    option = input('Bet?: ("C" for call, "R" for raise, "F" for fold)')
+    """
+    Ask the player what the next action is.
+    """
+    option = input('Bet?: ("C" for call (check), "R" for raise, "F" for fold)').upper()
     if option in ('R', 'C', 'F'):
         return option
     else:
@@ -10,13 +18,10 @@ def bet_option():
         return bet_option()
 
 
-HAND_RANK = ("High-Card", "One-Pair", "Two-Pair", "3-of-a-Kind", "Straight", "Flush", "Full-House", "4-of-a-Kind",
-             "Straight-Flush")
-RANK_LIST = ("2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A")
-SUIT_LIST = ("H", "S", "D", "C")
-
-
 def get_highest_hand_rank(card_list):
+    """
+    Get the highest hand rank from a card list (length should be 7)
+    """
     if len(card_list) != 7:
         raise ValueError('This method is only used on 7-card hand')
     rank_dict = collections.defaultdict(int)
@@ -29,7 +34,6 @@ def get_highest_hand_rank(card_list):
     rank_list = sorted(rank_dict.items(), key=lambda x: (x[1], RANK_LIST.index(x[0])), reverse=True)
     # sort the suit_list by suit_dict's value reversely. It's a list of tuples like ('H', 5)
     suit_list = sorted(suit_dict.items(), key=lambda x: x[1], reverse=True)
-
 
     # check for Full House or 4-of-a-kind
     if rank_list[0][1] == 4:

@@ -4,11 +4,6 @@ import time
 import re
 from StaticMethod import *
 
-HAND_RANK = ("High-Card", "One-Pair", "Two-Pair", "3-of-a-Kind", "Straight", "Flush", "Full-House", "4-of-a-Kind",
-             "Straight-Flush")
-RANK_LIST = ("2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A")
-SUIT_LIST = ("H", "S", "D", "C")
-
 
 class Card:
     """ Class that defines a particular card.  Each card has a rank and suit.
@@ -46,6 +41,16 @@ class Deck(set):
 
 
 class Player:
+    """
+    Class that defines a player's information and chips
+    Attributes:
+        hand: player's hand cards
+        chips: the total chips of a player
+        small_blind: the chips of a small blind need to bet
+        big_blind: the chips of a big blind need to bet
+        in_the_pot: chips that are already in the pot
+        is_continue: if the player wants to continue playing for next round (False if the player folds)
+    """
     def __init__(self, name, chips, small_blind, big_blind):
         self.name = name
         self.hand = []
@@ -68,6 +73,15 @@ class Player:
         return get_highest_hand_rank(self.hand + community_cards)
 
     def bet(self, option, last_bet, addition_bet):
+        """
+        The player's action.
+        Args:
+            option: The player can check ('C'), call ('C'), raise ('R') or fold ('F')
+            last_bet: last players bet
+            addition_bet: the amount the player wants to raise
+        Returns:
+            The total amount of chips player bets
+        """
         if option == 'C':
             self.in_the_pot = last_bet
         elif option == 'R':
@@ -78,6 +92,11 @@ class Player:
         return self.in_the_pot
 
     def start(self, blind):
+        """
+        When the game start, initialize the player's settings.
+        Args:
+            blind: ['Small', 'Big', None]  if the player is small blind, big blind or ordinary player
+        """
         if blind == 'Small':
             self.in_the_pot = self.small_blind
         elif blind == 'Big':
@@ -85,9 +104,15 @@ class Player:
         else:
             self.in_the_pot = 0
 
-    def restart(self, blind, reload=None):
-        if reload:
-            self.chips = reload
+    def restart(self, blind, rebuy=None):
+        """
+        Start the next game, settle the chips.
+        Args:
+            blind: ['Small', 'Big', None]  if the player is small blind, big blind or ordinary player
+            rebuy: the amount of chips if the payer wants to buy in again
+        """
+        if rebuy:
+            self.chips = rebuy
         self.is_continue = True
         self.hand = []
         if blind == 'Small':
@@ -99,6 +124,9 @@ class Player:
 
 
 class Game(Deck):
+    """
+    The game settings for Texas Poker, including all the methods to run a Poker game.
+    """
     def __init__(self, players, buy_in, small_blind, big_blind, blind=None, game_rule='Limited'):
         super().__init__()
         self.players = players
@@ -144,7 +172,7 @@ class Game(Deck):
         for player in players_reorder:
             print('-'*20 + '\n' + f'Player {player.name}\'s turn\n' + '-'*20)
             print(f'The community cards are: {self.community_cards}')
-            print(f'Your hole cards are:{player.get_hand()}')
+            print(f'Your hand cards are:{player.get_hand()}')
             player.show_chips()
             self.last_bet = player.bet(bet_option(), self.last_bet, self.addition_bet)
 
